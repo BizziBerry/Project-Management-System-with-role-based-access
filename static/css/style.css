@@ -1,0 +1,84 @@
+/* Дополнительные стили для улучшения внешнего вида */
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+/* Стили для статусов задач */
+.status-todo {
+    background-color: #6c757d;
+}
+
+.status-in_progress {
+    background-color: #fd7e14;
+}
+
+.status-review {
+    background-color: #0dcaf0;
+}
+
+.status-done {
+    background-color: #198754;
+}
+
+/* Стили для приоритетов */
+.priority-low {
+    background-color: #0dcaf0;
+}
+
+.priority-medium {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.priority-high {
+    background-color: #dc3545;
+}
+
+/* Анимации */
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Кастомные стили для форм */
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Стили для карточек проектов */
+.project-card {
+    transition: transform 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}

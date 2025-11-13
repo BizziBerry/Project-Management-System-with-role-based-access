@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление пользователями - Project Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Управление пользователями</h2>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Список пользователей</h5>
+    </div>
+    <div class="card-body">
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя пользователя</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Дата регистрации</th>
+                        <th>Последний вход</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            <strong>{{ user.username }}</strong>
+                            {% if user.is_superuser %}
+                            <span class="badge bg-danger ms-1">Superuser</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.email|default:"Не указан" }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if user.userprofile.role == 'admin' %}bg-danger
+                                {% elif user.userprofile.role == 'manager' %}bg-warning
+                                {% else %}bg-secondary{% endif %}">
+                                {{ user.userprofile.get_role_display }}
+                            </span>
+                        </td>
+                        <td>{{ user.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>{{ user.last_login|date:"d.m.Y H:i"|default:"Никогда" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'change_user_role' user.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <select name="role" class="form-select form-select-sm">
+                                        <option value="user" {% if user.userprofile.role == 'user' %}selected{% endif %}>Пользователь</option>
+                                        <option value="manager" {% if user.userprofile.role == 'manager' %}selected{% endif %}>Менеджер</option>
+                                        <option value="admin" {% if user.userprofile.role == 'admin' %}selected{% endif %}>Администратор</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Изменить</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <h5>Пользователи не найдены</h5>
+            <p>В системе пока нет зарегистрированных пользователей.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body text-center">
+                <h4>{{ users.count }}</h4>
+                <p class="mb-0">Всего пользователей</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body text-center">
+                <h4>{{ admin_count }}</h4>
+                <p class="mb-0">Администраторов</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body text-center">
+                <h4>{{ manager_count }}</h4>
+                <p class="mb-0">Менеджеров</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

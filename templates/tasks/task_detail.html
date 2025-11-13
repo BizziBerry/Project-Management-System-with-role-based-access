@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} - Project Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h2>{{ task.title }}</h2>
+                    <div>
+                        <!-- УПРАВЛЕНИЕ ДЛЯ МЕНЕДЖЕРОВ И АДМИНОВ -->
+                        {% if user.userprofile.is_manager or user.userprofile.is_admin %}
+                        <a href="{% url 'task_update' task.pk %}" class="btn btn-outline-secondary btn-sm">Редактировать</a>
+                        <a href="{% url 'task_delete' task.pk %}" class="btn btn-outline-danger btn-sm">Удалить</a>
+                        {% endif %}
+                        
+                        <!-- КНОПКА "ЗАВЕРШИТЬ" ДЛЯ ИСПОЛНИТЕЛЯ -->
+                        {% if task.assigned_to.id == user.id and task.status != 'done' %}
+                            <a href="{% url 'task_complete' task.pk %}" class="btn btn-success btn-sm">Завершить задачу</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <p class="card-text">{{ task.description }}</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <strong>Проект:</strong> 
+                        <a href="{% url 'project_detail' task.project.pk %}">{{ task.project.title }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Приоритет:</strong>
+                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}info{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Статус:</strong>
+                        <span class="badge bg-{% if task.status == 'done' %}success{% elif task.status == 'in_progress' %}warning{% elif task.status == 'review' %}info{% else %}secondary{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Назначена:</strong> 
+                        {% if task.assigned_to %}
+                            {{ task.assigned_to.username }}
+                            {% if task.assigned_to.id == user.id %}
+                            <span class="badge bg-primary">Вам</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Не назначена</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Срок:</strong> 
+                        {% if task.due_date %}
+                            {{ task.due_date }}
+                        {% else %}
+                            <span class="text-muted">Не установлен</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Создатель:</strong> {{ task.created_by.username }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4>Комментарии</h4>
+        {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ comment.author.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+                <p class="mb-0">{{ comment.content }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">Пока нет комментариев.</div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Добавить комментарий</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ comment_form.content }}
+                    <button type="submit" class="btn btn-primary mt-2">Добавить комментарий</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

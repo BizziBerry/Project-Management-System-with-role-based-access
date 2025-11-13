@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Проекты - Project Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Список проектов</h2>
+    {% if user.userprofile.is_manager or user.userprofile.is_admin %}
+    <a href="{% url 'project_create' %}" class="btn btn-primary">Создать проект</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% for project in projects %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 project-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ project.title }}</h5>
+                <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+                <div class="mb-2">
+                    <span class="badge bg-{% if project.status == 'active' %}success{% elif project.status == 'completed' %}secondary{% else %}warning{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-muted small">Создатель: {{ project.created_by.username }}</p>
+                <p class="text-muted small">Задач: {{ project.tasks.count }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                {% if user.userprofile.is_manager or user.userprofile.is_admin %}
+                <a href="{% url 'project_update' project.pk %}" class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                {% endif %}
+                {% if user.userprofile.is_admin %}
+                <a href="{% url 'project_delete' project.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <h5>Проекты еще не созданы</h5>
+            {% if user.userprofile.is_manager or user.userprofile.is_admin %}
+            <p>Создайте первый проект!</p>
+            <a href="{% url 'project_create' %}" class="btn btn-primary">Создать проект</a>
+            {% else %}
+            <p>Ожидайте, когда менеджер создаст проекты</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - Project Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ project.title }}</h2>
+    <div>
+        {% if user.userprofile.is_manager or user.userprofile.is_admin %}
+        <a href="{% url 'task_create_for_project' project.pk %}" class="btn btn-primary">Добавить задачу</a>
+        <a href="{% url 'project_update' project.pk %}" class="btn btn-outline-secondary">Редактировать</a>
+        {% endif %}
+        {% if user.userprofile.is_admin %}
+        <a href="{% url 'project_delete' project.pk %}" class="btn btn-outline-danger">Удалить</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Описание проекта</h5>
+                <p class="card-text">{{ project.description }}</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Статус:</strong>
+                        <span class="badge bg-{% if project.status == 'active' %}success{% elif project.status == 'completed' %}secondary{% else %}warning{% endif %}">
+                            {{ project.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Создатель:</strong> {{ project.created_by.username }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4>Задачи проекта</h4>
+        {% if tasks %}
+        <div class="list-group">
+            {% for task in tasks %}
+            <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+                    </h5>
+                    <small>
+                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}info{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                        <span class="badge bg-secondary">{{ task.get_status_display }}</span>
+                    </small>
+                </div>
+                <p class="mb-1">{{ task.description|truncatewords:15 }}</p>
+                <small>
+                    Назначена: {% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Не назначена{% endif %}
+                    | Срок: {% if task.due_date %}{{ task.due_date }}{% else %}Не установлен{% endif %}
+                </small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">В этом проекте пока нет задач.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

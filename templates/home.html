@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Project Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="mb-4">Добро пожаловать в Project Manager</h1>
+        
+        {% if user.is_authenticated %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ваша роль: {{ user.profile.get_role_display }}</h5>
+                    <p class="card-text">
+                        {% if user.profile.role == 'admin' %}
+                            Вы имеете полный доступ ко всем функциям системы.
+                        {% elif user.profile.role == 'manager' %}
+                            Вы можете управлять проектами и задачами, но не можете удалять проекты.
+                        {% else %}
+                            Вы можете просматривать проекты и комментировать задачи.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'project_list' %}" class="btn btn-primary">Перейти к проектам</a>
+                </div>
+            </div>
+        {% else %}
+            <p class="lead">Пожалуйста, войдите в систему или зарегистрируйтесь для доступа к проектам.</p>
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn btn-primary me-2">Войти</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-primary">Регистрация</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

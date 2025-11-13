@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить задачу - Project Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Подтверждение удаления</h4>
+            </div>
+            <div class="card-body text-center">
+                <h5>Вы уверены, что хотите удалить задачу "{{ task.title }}"?</h5>
+                <p class="text-danger">Это действие нельзя отменить. Все связанные комментарии также будут удалены.</p>
+                
+                <div class="card mb-3">
+                    <div class="card-body text-start">
+                        <strong>Информация о задаче:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Проект: {{ task.project.title }}</li>
+                            <li>Статус: {{ task.get_status_display }}</li>
+                            <li>Приоритет: {{ task.get_priority_display }}</li>
+                            <li>Назначена: {% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Не назначена{% endif %}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Да, удалить</button>
+                    <a href="{% url 'task_detail' task.pk %}" class="btn btn-outline-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
